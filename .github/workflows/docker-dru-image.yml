@@ -28,7 +28,7 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Install Git
-      run: sudo apt-get update && sudo apt-get install -y git
+      run: apt-get update && apt-get install -y git
     - name: Build and push (official eoepca image)
       uses: docker/build-push-action@v4
       with:
