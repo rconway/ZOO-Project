@@ -2,7 +2,7 @@ name: Docker Image CI (DRU support)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "*" ]
   pull_request:
     branches: [ main ]
 
@@ -27,24 +27,6 @@ jobs:
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - name: Build and push
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        file: docker/dru/Dockerfile
-        tags: ${{secrets.DOCKER_USER}}/zookernel:dru-${{ github.sha }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-    - name: Build and push (official dru image)
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        file: docker/dru/Dockerfile
-        tags: zooproject/zoo-project:dru-${{ github.sha }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
     - name: Build and push (official eoepca image)
       uses: docker/build-push-action@v4
       with:
@@ -55,7 +37,7 @@ jobs:
           CONDA_ENV_NAME=env_zoo_calrissian
           PY_VER=3.10
           CONDA_ENV_FILE=https://raw.githubusercontent.com/EOEPCA/eoepca-proc-service-template/master/.devcontainer/environment.yml
-        tags: zooproject/zoo-project:eoepca-${{ github.sha }}
+        tags: ${{secrets.DOCKER_USER}}/zoo-project:eoepca-${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-eoepca-cache
         cache-to: type=local,dest=/tmp/.buildx-eoepca-cache-new,mode=max
     - name: Move cache
@@ -64,22 +46,3 @@ jobs:
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
         rm -rf /tmp/.buildx-eoepca-cache
         mv /tmp/.buildx-eoepca-cache-new /tmp/.buildx-eoepca-cache
-    - name: Build and push latest
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        file: docker/dru/Dockerfile
-        tags: ${{secrets.DOCKER_USER}}/zookernel:dru-latest
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-    - name: Build and push latest
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        file: docker/dru/Dockerfile
-        tags: zooproject/zoo-project:dru-latest
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-
